@@ -15,6 +15,7 @@ var gameBoard = document.querySelector('#game-section');
 var letterKey = document.querySelector('#key-section');
 var rules = document.querySelector('#rules-section');
 var stats = document.querySelector('#stats-section');
+var spaceHolder = document.querySelector('.space-holder');
 
 // Event Listeners
 window.addEventListener('load', setGame);
@@ -38,7 +39,10 @@ viewStatsButton.addEventListener('click', viewStats);
 // Functions
 function setGame() {
   winningWord = getRandomWord();
+  console.log(winningWord);
   updateInputPermissions();
+  //clear inputs
+  //change boxes colors
 }
 
 function getRandomWord() {
@@ -162,6 +166,33 @@ function changeRow() {
 
 function declareWinner() {
   console.log('winner!');
+  spaceHolder.innerText = `You Won Turdle in ${currentRow}`;
+  if(currentRow > 1) {
+  spaceHolder.innerText += ` guesses!`;
+  } else {
+  spaceHolder.innerText += ` guess!`
+  }
+  setTimeout(resetGame,500)
+}
+
+function resetGame() {
+  console.log('gameresetting');
+  spaceHolder.innerText = "";
+  currentRow = 1;
+  guess = "";
+  resetInputs();
+  setGame();
+  //change key box colors
+  // setTimeout(console.log(4 seconds),4000)
+}
+
+function resetInputs() {
+  for(var i = 0; i < 30; i++) {
+  inputs[i].classList =""
+  inputs[i].value ="";
+  keyLetters[i].classList ="";
+  }
+  inputs[0].focus();
 }
 
 function viewRules() {
