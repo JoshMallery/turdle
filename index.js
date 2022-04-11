@@ -10,40 +10,11 @@ let totalRows = 0;
 let currentWinStatus = null;
 let words
 
+//Fetch Data
 fetch('http://localhost:3001/api/v1/words').then(data => data.json()).then(data => defineWords(data));
-
-function defineWords(wordData) {
-  words = wordData;
-  setGame();
-}
 
 fetch('http://localhost:3001/api/v1/games').then(data => data.json()).then(data => retrieveStats(data));
 
-function retrieveStats(data) {
-  gamesPlayed = data.length;
-  totalRows = data
-    .filter(game => game.solved)
-    .reduce((acc,cur) =>{
-      console.log(acc)
-        acc+= Number(cur.numGuesses);
-      return acc
-    },0);
-
-    gamesWon = data.filter(game=>game.solved).length;
-  console.log(data)
-  loadStats()
-}
-
-function loadStats() {
-  winPercent = ((gamesWon/gamesPlayed) * 100);
-  // totalRows += currentRow;
-  console.log(totalRows)
-  avgAttempts = (totalRows/gamesWon).toFixed(1);
-  totalGamesText.innerText = `${gamesPlayed}`;
-  percentCorrectText.innerText = `${winPercent}`;
-  avgGuessesText.innerText = `${avgAttempts}`;
-
-}
 // Query Selectors
 var inputs = document.querySelectorAll('input');
 var guessButton = document.querySelector('#guess-button');
@@ -61,7 +32,6 @@ var totalGamesText = document.querySelector('#stats-total-games');
 var percentCorrectText = document.querySelector('#stats-percent-correct');
 var avgGuessesText = document.querySelector('#stats-average-guesses');
 // Event Listeners
-// window.addEventListener('load', setGame);
 
 for (var i = 0; i < inputs.length; i++) {
   inputs[i].addEventListener('keyup', function() { moveToNextInput(event) });
@@ -80,12 +50,35 @@ viewGameButton.addEventListener('click', viewGame);
 viewStatsButton.addEventListener('click', viewStats);
 
 // Functions
+function defineWords(wordData) {
+  words = wordData;
+  setGame();
+}
+
+function retrieveStats(data) {
+  gamesPlayed = data.length;
+  totalRows = data
+  .filter(game => game.solved)
+  .reduce((acc,cur) =>{
+    acc+= Number(cur.numGuesses);
+    return acc
+  },0);
+
+  gamesWon = data.filter(game => game.solved).length;
+  loadStats()
+}
+
+function loadStats() {
+  winPercent = ((gamesWon/gamesPlayed) * 100).toFixed(1);
+  avgAttempts = (totalRows/gamesWon).toFixed(1);
+  totalGamesText.innerText = `${gamesPlayed}`;
+  percentCorrectText.innerText = `${winPercent}`;
+  avgGuessesText.innerText = `${avgAttempts}`;
+}
+
 function setGame() {
   winningWord = getRandomWord();
-  console.log(winningWord);
   updateInputPermissions();
-  //clear inputs
-  //change boxes colors
 }
 
 function getRandomWord() {
@@ -211,17 +204,15 @@ function changeRow() {
 }
 
 function declareLoser(){
-  console.log('you lost');
   spaceHolder.innerText = `You Lost Turdle! the word was ${winningWord}`;
   gamesPlayed++
   winPercent = ((gamesWon/gamesPlayed) * 100).toFixed(1);
   currentWinStatus = false;
   updateStats();
-  setTimeout(resetGame,500)
+  setTimeout(resetGame,4000)
 }
 
 function declareWinner() {
-  console.log('winner!');
   spaceHolder.innerText = `You Won Turdle in ${currentRow}`;
 
   if(currentRow > 1) {
@@ -232,39 +223,34 @@ function declareWinner() {
 
   gamesPlayed++
   gamesWon++
-  winPercent = ((gamesWon/gamesPlayed) * 100);
+  winPercent = ((gamesWon/gamesPlayed) * 100).toFixed(1);
   totalRows += currentRow;
   avgAttempts = (totalRows/gamesWon).toFixed(1);
   currentWinStatus = true;
   updateStats();
-  setTimeout(resetGame,500)
+  setTimeout(resetGame,4000)
 }
 
 function updateStats() {
   totalGamesText.innerText = `${gamesPlayed}`;
   percentCorrectText.innerText = `${winPercent}`;
   avgGuessesText.innerText = `${avgAttempts}`;
-  console.log(typeof currentWinStatus);
 
   fetch('http://localhost:3001/api/v1/games',{
     method:'POST',
     body:JSON.stringify({solved: currentWinStatus,guesses:`${currentRow}`}),
     headers:{'Content-type': 'application/json'}
     })
-    .then(response => response.json())
-    .then(data=>console.log('post confirm',data));
+    .then(response => response.json());
 }
 
 
 function resetGame() {
-  console.log('gameresetting');
   spaceHolder.innerText = "";
   currentRow = 1;
   guess = "";
   resetInputs();
   setGame();
-  //change key box colors
-  // setTimeout(console.log(4 seconds),4000)
 }
 
 function resetInputs() {
