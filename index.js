@@ -2,6 +2,11 @@
 var winningWord = '';
 var currentRow = 1;
 var guess = '';
+let gamesPlayed = 0;
+let winPercent;
+let avgAttempts;
+let gamesWon = 0;
+let totalRows = 0;
 let words
 
 fetch('http://localhost:3001/api/v1/words').then(data => data.json()).then(data => defineWords(data));
@@ -23,7 +28,9 @@ var letterKey = document.querySelector('#key-section');
 var rules = document.querySelector('#rules-section');
 var stats = document.querySelector('#stats-section');
 var spaceHolder = document.querySelector('.space-holder');
-
+var totalGamesText = document.querySelector('#stats-total-games');
+var percentCorrectText = document.querySelector('#stats-percent-correct');
+var avgGuessesText = document.querySelector('#stats-average-guesses');
 // Event Listeners
 // window.addEventListener('load', setGame);
 
@@ -167,20 +174,47 @@ function checkForWin() {
 }
 
 function changeRow() {
+  if(currentRow === 6){
+    declareLoser();
+  }
   currentRow++;
   updateInputPermissions();
+}
+
+function declareLoser(){
+  console.log('you lost');
+  spaceHolder.innerText = `You Lost Turdle! the word was ${winningWord}`;
+  gamesPlayed++
+  winPercent = ((gamesWon/gamesPlayed) * 100).toFixed(1);
+  updateStats();
+  setTimeout(resetGame,500)
 }
 
 function declareWinner() {
   console.log('winner!');
   spaceHolder.innerText = `You Won Turdle in ${currentRow}`;
+
   if(currentRow > 1) {
-  spaceHolder.innerText += ` guesses!`;
+    spaceHolder.innerText += ` guesses!`;
   } else {
-  spaceHolder.innerText += ` guess!`
+    spaceHolder.innerText += ` guess!`
   }
+
+  gamesPlayed++
+  gamesWon++
+  winPercent = ((gamesWon/gamesPlayed) * 100);
+  totalRows += currentRow;
+  avgAttempts = (totalRows/gamesWon).toFixed(1);
+  updateStats();
   setTimeout(resetGame,500)
 }
+
+function updateStats() {
+  totalGamesText.innerText = `${gamesPlayed}`
+  percentCorrectText.innerText = `${winPercent}`
+  avgGuessesText.innerText = `${avgAttempts}`
+}
+
 
 function resetGame() {
   console.log('gameresetting');
