@@ -2,7 +2,14 @@
 var winningWord = '';
 var currentRow = 1;
 var guess = '';
+let words
 
+fetch('http://localhost:3001/api/v1/words').then(data => data.json()).then(data => defineWords(data));
+
+function defineWords(wordData) {
+  words = wordData;
+  setGame();
+}
 // Query Selectors
 var inputs = document.querySelectorAll('input');
 var guessButton = document.querySelector('#guess-button');
@@ -18,7 +25,7 @@ var stats = document.querySelector('#stats-section');
 var spaceHolder = document.querySelector('.space-holder');
 
 // Event Listeners
-window.addEventListener('load', setGame);
+// window.addEventListener('load', setGame);
 
 for (var i = 0; i < inputs.length; i++) {
   inputs[i].addEventListener('keyup', function() { moveToNextInput(event) });
