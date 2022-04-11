@@ -175,7 +175,7 @@ function checkForWin() {
 
 function changeRow() {
   if(currentRow === 6){
-    loseGame()
+    declareLoser();
   }
   currentRow++;
   updateInputPermissions();
@@ -185,7 +185,7 @@ function declareLoser(){
   console.log('you lost');
   spaceHolder.innerText = `You Lost Turdle! the word was ${winningWord}`;
   gamesPlayed++
-  winPercent = ((gamesWon/gamesPlayed) * 100);
+  winPercent = ((gamesWon/gamesPlayed) * 100).toFixed(1);
   updateStats();
   setTimeout(resetGame,500)
 }
@@ -193,11 +193,13 @@ function declareLoser(){
 function declareWinner() {
   console.log('winner!');
   spaceHolder.innerText = `You Won Turdle in ${currentRow}`;
+
   if(currentRow > 1) {
-  spaceHolder.innerText += ` guesses!`;
+    spaceHolder.innerText += ` guesses!`;
   } else {
-  spaceHolder.innerText += ` guess!`
+    spaceHolder.innerText += ` guess!`
   }
+
   gamesPlayed++
   gamesWon++
   winPercent = ((gamesWon/gamesPlayed) * 100);
