@@ -5,8 +5,8 @@ var guess = '';
 let gamesPlayed = 0;
 let winPercent;
 let avgAttempts;
-let gamesWon;
-let totalRows;
+let gamesWon = 0;
+let totalRows = 0;
 let words
 
 fetch('http://localhost:3001/api/v1/words').then(data => data.json()).then(data => defineWords(data));
@@ -30,7 +30,7 @@ var stats = document.querySelector('#stats-section');
 var spaceHolder = document.querySelector('.space-holder');
 var totalGamesText = document.querySelector('#stats-total-games');
 var percentCorrectText = document.querySelector('#stats-percent-correct');
-var totalGamesText = document.querySelector('#stats-average-guesses');
+var avgGuessesText = document.querySelector('#stats-average-guesses');
 // Event Listeners
 // window.addEventListener('load', setGame);
 
@@ -189,16 +189,16 @@ function declareWinner() {
   gamesPlayed++
   gamesWon++
   winPercent = ((gamesWon/gamesPlayed) * 100);
-  totalRows += currentRow
+  totalRows += currentRow;
   avgAttempts = (totalRows/gamesWon).toFixed(1);
   updateStats();
   setTimeout(resetGame,500)
 }
 
 function updateStats() {
-  totalGames.innerText = `${gamesPlayed}`
+  totalGamesText.innerText = `${gamesPlayed}`
   percentCorrectText.innerText = `${winPercent}`
-  totalGamesText.innerText = `${avgAttempts}`
+  avgGuessesText.innerText = `${avgAttempts}`
 }
 
 
