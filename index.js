@@ -174,8 +174,20 @@ function checkForWin() {
 }
 
 function changeRow() {
+  if(currentRow === 6){
+    loseGame()
+  }
   currentRow++;
   updateInputPermissions();
+}
+
+function declareLoser(){
+  console.log('you lost');
+  spaceHolder.innerText = `You Lost Turdle! the word was ${winningWord}`;
+  gamesPlayed++
+  winPercent = ((gamesWon/gamesPlayed) * 100);
+  updateStats();
+  setTimeout(resetGame,500)
 }
 
 function declareWinner() {
