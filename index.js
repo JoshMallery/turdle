@@ -3,10 +3,11 @@ var winningWord = '';
 var currentRow = 1;
 var guess = '';
 let gamesPlayed = 0;
-let winPercent;
-let avgAttempts;
+let winPercent = null;
+let avgAttempts = null;
 let gamesWon = 0;
 let totalRows = 0;
+let currentWinStatus = null;
 let words
 
 fetch('http://localhost:3001/api/v1/words').then(data => data.json()).then(data => defineWords(data));
@@ -14,6 +15,34 @@ fetch('http://localhost:3001/api/v1/words').then(data => data.json()).then(data 
 function defineWords(wordData) {
   words = wordData;
   setGame();
+}
+
+fetch('http://localhost:3001/api/v1/games').then(data => data.json()).then(data => retrieveStats(data));
+
+function retrieveStats(data) {
+  gamesPlayed = data.length;
+  totalRows = data
+    .filter(game => game.solved)
+    .reduce((acc,cur) =>{
+      console.log(acc)
+        acc+= Number(cur.numGuesses);
+      return acc
+    },0);
+
+    gamesWon = data.filter(game=>game.solved).length;
+  console.log(data)
+  loadStats()
+}
+
+function loadStats() {
+  winPercent = ((gamesWon/gamesPlayed) * 100);
+  // totalRows += currentRow;
+  console.log(totalRows)
+  avgAttempts = (totalRows/gamesWon).toFixed(1);
+  totalGamesText.innerText = `${gamesPlayed}`;
+  percentCorrectText.innerText = `${winPercent}`;
+  avgGuessesText.innerText = `${avgAttempts}`;
+
 }
 // Query Selectors
 var inputs = document.querySelectorAll('input');
@@ -186,6 +215,7 @@ function declareLoser(){
   spaceHolder.innerText = `You Lost Turdle! the word was ${winningWord}`;
   gamesPlayed++
   winPercent = ((gamesWon/gamesPlayed) * 100).toFixed(1);
+  currentWinStatus = false;
   updateStats();
   setTimeout(resetGame,500)
 }
@@ -205,14 +235,24 @@ function declareWinner() {
   winPercent = ((gamesWon/gamesPlayed) * 100);
   totalRows += currentRow;
   avgAttempts = (totalRows/gamesWon).toFixed(1);
+  currentWinStatus = true;
   updateStats();
   setTimeout(resetGame,500)
 }
 
 function updateStats() {
-  totalGamesText.innerText = `${gamesPlayed}`
-  percentCorrectText.innerText = `${winPercent}`
-  avgGuessesText.innerText = `${avgAttempts}`
+  totalGamesText.innerText = `${gamesPlayed}`;
+  percentCorrectText.innerText = `${winPercent}`;
+  avgGuessesText.innerText = `${avgAttempts}`;
+  console.log(typeof currentWinStatus);
+
+  fetch('http://localhost:3001/api/v1/games',{
+    method:'POST',
+    body:JSON.stringify({solved: currentWinStatus,guesses:`${currentRow}`}),
+    headers:{'Content-type': 'application/json'}
+    })
+    .then(response => response.json())
+    .then(data=>console.log('post confirm',data));
 }
 
 
